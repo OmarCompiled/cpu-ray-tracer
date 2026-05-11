@@ -53,6 +53,18 @@ class vec3 {
     vec3 normalized() {
       return *this / this->length();
     };
+    
+    static vec3 i() {
+      return vec3(1.0f, 0.0f, 0.0f);
+    }
+
+    static vec3 j() {
+      return vec3(0.0f, 1.0f, 0.0f);
+    }
+
+    static vec3 k() {
+      return vec3(0.0f, 0.0f, 1.0f);
+    }
 };
 
 class vec4 {

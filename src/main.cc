@@ -5,20 +5,31 @@
 #include "../include/stb_image_write.h"
 #include "../include/vec.h"
 #include "../include/color.h"
+#include "../include/ray.h"
+
+float aspect_ratio  = 16.0f / 9.0f;
+int width           = 800;
+int height          = (int)(width / aspect_ratio);
+height = (height > 1) ? height : 1;
+
+float focal_length    = 1.0f;
+float viewport_height = 2.0f;
+float viewport_width  = viewport_height * (float(width)/height); // since aspect_ratio is ideal not actual
+
+vec3 camera_position {0.0f, 0.0f, 0.0f};
 
 int
 main() {
-  const int width = 800;
-  const int height = 800;
-  std::vector<uint8_t> buffer;
+  std::vector<uint8_t> buffer; // uint8_t necessary for stb_image_write functions.
 
   for(int i = 0; i < width; i++) {
     for(int j = 0; j < height; j++) {
-      float r = i / (float) width;
-      float g = j / (float) height;
-      float b = 0.3f;
+      color pixel_color = {
+       i / (float)width,
+       j / (float)height, 
+       0.0f
+      };
 
-      color pixel_color = color(r, g, b);
       write_pixel_png(buffer, pixel_color);
     }
   }
