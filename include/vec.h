@@ -46,14 +46,6 @@ class vec3 {
       return e[0] * e[0] + e[1] * e[1] + e[2] * e[2];
     }
     
-    vec3 operator/(float s) const {
-      return vec3(e[0]/s, e[1]/s, e[2]/s);
-    }
-  
-    vec3 normalized() {
-      return *this / this->length();
-    };
-    
     static vec3 i() {
       return vec3(1.0f, 0.0f, 0.0f);
     }
@@ -65,6 +57,8 @@ class vec3 {
     static vec3 k() {
       return vec3(0.0f, 0.0f, 1.0f);
     }
+
+    vec3 normalized() const;
 };
 
 class vec4 {
@@ -113,15 +107,8 @@ class vec4 {
       return e[0] * e[0] + e[1] * e[1]
         + e[2] * e[2] + e[3] * e[3];
     }
-
-    vec4 operator/(float s) const {
-      return vec4(e[0]/s, e[1]/s, e[2]/s, e[3]/s);
-    }
-  
-    vec4 normalized() {
-      return *this / this->length();
-    };
-
+    
+    vec4 normalized() const;
 };
 
 inline vec3 operator+(const vec3& v, const vec3& u) {
@@ -190,4 +177,12 @@ inline vec3 cross(const vec3& v, const vec3& u) {
   return vec3(v[1] * u[2] - v[2] * u[1],
               v[2] * u[0] - v[0] * u[2],
               v[0] * u[1] - v[1] * u[0]);
+}
+
+vec3 vec3::normalized() const {
+  return *this/this->length();
+}
+
+vec4 vec4::normalized() const {
+  return *this/this->length();
 }

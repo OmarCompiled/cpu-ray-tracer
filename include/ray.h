@@ -10,8 +10,8 @@ public:
   const vec3& origin() const {return m_Origin;}
   const vec3& direction() const {return m_Direction;}
 
-  vec3 at(float t) {
-    m_Origin + (t * m_Direction);
+  vec3 at(float t) const {
+    return m_Origin + (t * m_Direction);
   }
 
 private:

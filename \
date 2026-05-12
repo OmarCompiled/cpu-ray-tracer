@@ -36,8 +36,8 @@ float hit_sphere(const vec3& center, float radius, const ray& r) {
   // may or may not normalize direction vector
   vec3 cq = center - r.origin();
   float a = r.direction().length_squared();
-  float b = -2.0f * dot(r.direction(), cq);
   float c = (cq.length_squared()) - (radius * radius);
+  float b = 2 * dot(r.direction(), cq);
   float discriminant = b*b - 4*a*c;
   if(discriminant < 0) {
     return -1;
@@ -49,7 +49,7 @@ float hit_sphere(const vec3& center, float radius, const ray& r) {
 color
 ray_color(const ray& r) {
   float t = hit_sphere(-vec3::k(), 0.3f, r);
-  if(t >= 0.0f) {
+  if(t > 0.0f) {
     vec3 N = vec3(r.at(t) + vec3::k()).normalized();
     return 0.5f * (N+1.0f);
   }
