@@ -1,20 +1,23 @@
-#pragma once
+#ifndef CPURAYTRACER_INCLUDE_RAY_H_
+#define CPURAYTRACER_INCLUDE_RAY_H_
 
 #include "vec.h"
 
-class ray {
+class Ray {
 public:
-  ray() {}
-  ray(const vec3& origin, const vec3& direction) : m_Origin(origin), m_Direction(direction) {}
+  Ray() {}
+  Ray(const Vec3& origin, const Vec3& direction) : origin_(origin), direction_(direction) {}
 
-  const vec3& origin() const {return m_Origin;}
-  const vec3& direction() const {return m_Direction;}
+  const Vec3& origin() const {return origin_;}
+  const Vec3& direction() const {return direction_;}
 
-  vec3 at(float t) const {
-    return m_Origin + (t * m_Direction);
+  Vec3 at(float t) const {
+    return origin_ + (t * direction_);
   }
 
 private:
-  vec3 m_Origin;
-  vec3 m_Direction;
+  Vec3 origin_;
+  Vec3 direction_;
 };
+
+#endif
