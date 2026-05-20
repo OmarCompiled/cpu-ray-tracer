@@ -17,21 +17,25 @@ class HittableList : public Hittable {
       add(list);
     }
 
-    void add(std::shared_ptr<Hittable> object) {
+    void 
+    add(std::shared_ptr<Hittable> object) {
       objects.push_back(object);
     }
 
-    void add(std::initializer_list<std::shared_ptr<Hittable>> list) {
+    void
+    add(std::initializer_list<std::shared_ptr<Hittable>> list) {
       for(std::shared_ptr<Hittable> object : list) {
         add(object);
       }
     }
 
-    void clear() {
+    void
+    clear() {
       objects.clear();
     }
 
-    bool hit(const Ray& ray, const Interval& interval, HitRecord& hitRecord) const override {
+    bool
+    hit(const Ray& ray, const Interval& interval, HitRecord& hitRecord) const override {
       HitRecord tempHitRecord;
       bool hitAnything = false;
       float closestSoFar = interval.max;

@@ -36,9 +36,11 @@ random(float min, float max) {
 
 }
 
-#include "../include/interval.h"
-#include "../include/vec.h"
-#include "../include/color.h"
-#include "../include/ray.h"
+namespace ImageFormat {
+  namespace PNG {
+    const int RGBA  = 4;
+    const int RGB   = 3;
+  }
+}
 
 #endif

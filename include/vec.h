@@ -4,6 +4,8 @@
 #include <array> // much safer
 #include <cmath>
 
+#include "../include/utilities.h"
+
 class Vec3 {
   private:
     std::array<float, 3> e_; // e is the generalized notation for dimensions
@@ -18,11 +20,17 @@ class Vec3 {
     float y() const {return e_[1];}
     float z() const {return e_[2];}
 
-    Vec3 operator-() const {return Vec3(-e_[0], -e_[1], -e_[2]);}
-    float operator[](int i) const {return e_.at(i);} // this will throw an exception on invalid i;
-    float& operator[](int i) {return e_.at(i);}
+    Vec3 
+    operator-() const {return Vec3(-e_[0], -e_[1], -e_[2]);}
+
+    float
+    operator[](int i) const {return e_.at(i);} // this will throw an exception on invalid i;
+
+    float&
+    operator[](int i) {return e_.at(i);}
     
-    bool operator==(const Vec3& other) {
+    bool
+    operator==(const Vec3& other) {
       float diffX = std::abs(other.x() - x());
       float diffY = std::abs(other.y() - y());
       float diffZ = std::abs(other.z() - z());
@@ -33,57 +41,79 @@ class Vec3 {
       return false;
     }
 
-    Vec3& operator+=(const Vec3& v) {
+    Vec3&
+    operator+=(const Vec3& v) {
       e_[0] += v[0];
       e_[1] += v[1];
       e_[2] += v[2];
       return *this;
     }
 
-    Vec3& operator*=(float s) {
+    Vec3&
+    operator*=(float s) {
       e_[0] *= s;
       e_[1] *= s;
       e_[2] *= s;
       return *this;
     }
 
-    Vec3& operator/=(float s) {
+    Vec3&
+    operator/=(float s) {
       return *this *= 1.0f/s;
     }
 
-    float length() const {
+    float
+    length() const {
       return std::sqrt(this->lengthSquared());
     }
 
-    float lengthSquared() const {
+
+    float
+    lengthSquared() const {
       return e_[0] * e_[0] + e_[1] * e_[1] + e_[2] * e_[2];
     }
 
-    static Vec3 i() {
+    static Vec3
+    i() {
       return Vec3(1.0f, 0.0f, 0.0f);
     }
 
-    static Vec3 j() {
+    static Vec3
+    j() {
       return Vec3(0.0f, 1.0f, 0.0f);
     }
 
-    static Vec3 k() {
+    static Vec3
+    k() {
       return Vec3(0.0f, 0.0f, 1.0f);
     }
 
-    static float dot(const Vec3& v, const Vec3& u) {
+    static Vec3
+    random() {
+      return Vec3(math::random(), math::random(), math::random());
+    }
+
+    static Vec3
+    random(float min, float max) {
+      return Vec3(math::random(min, max), math::random(min, max), math::random(min, max));
+    }
+
+    static float
+    dot(const Vec3& v, const Vec3& u) {
       return  v[0] * u[0] 
         + v[1] * u[1] 
         + v[2] * u[2]; 
     }
 
-    static Vec3 cross(const Vec3& v, const Vec3& u) {
+    static Vec3
+    cross(const Vec3& v, const Vec3& u) {
       return Vec3(v[1] * u[2] - v[2] * u[1],
           v[2] * u[0] - v[0] * u[2],
           v[0] * u[1] - v[1] * u[0]);
     }
 
-    Vec3 normalized() const;
+    Vec3
+    normalized() const;
 
     static const Vec3 right;
     static const Vec3 up;
@@ -205,12 +235,28 @@ inline Vec4 operator/(const Vec4& v, float s) {
   return (1/s) * v;
 }
 
-Vec3 Vec3::normalized() const {
+Vec3
+Vec3::normalized() const {
   return *this/this->length();
 }
 
-Vec4 Vec4::normalized() const {
+Vec4
+Vec4::normalized() const {
   return *this/this->length();
+}
+
+
+namespace utilities {
+  inline Vec3
+  randomUnitVector() {
+    while(true) {
+      Vec3 randomVector = Vec3::random(-1, 1);
+      float lengthSquared = randomVector.lengthSquared();
+      if(std::numeric_limits<float>::min() < lengthSquared && lengthSquared <= 1.0f) {
+        return randomVector.normalized();
+      }
+    }
+  }
 }
 
 #endif

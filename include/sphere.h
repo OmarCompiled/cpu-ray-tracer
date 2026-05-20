@@ -9,7 +9,8 @@ class Sphere : public Hittable {
   public:
     Sphere(const Vec3& center, float radius) : center_(center), radius_(std::fmax(0, radius)) {};
   
-    bool hit(const Ray& ray, const Interval& interval, HitRecord& hitRecord) const override {
+    bool 
+    hit(const Ray& ray, const Interval& interval, HitRecord& hitRecord) const override {
       Vec3 qc = center_ - ray.origin(); // qc arbitrary name; convention in mathematics (point p, q, etc...)
       float a = ray.direction().lengthSquared();
       float h = Vec3::dot(qc, ray.direction()); // h = b / -2.0f

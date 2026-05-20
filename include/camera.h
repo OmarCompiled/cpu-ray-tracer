@@ -1,41 +1,67 @@
 #ifndef CPURAYTRACER_INCLUDE_CAMERA_H_
 #define CPURAYTRACER_INCLUDE_CAMERA_H_
 
+#include <vector>
+#include <thread>
+
+#include "../include/utilities.h"
+
+enum AntialiasingSamplingType {
+  SQUARE,
+};
+
 class Camera {
   public:
-    void
-    render(std::vector<uint8_t>& buffer, const HittableList& world) {
-      initialize();
+    uint8_t* buffer = new uint8_t[10];
+    std::vector<std::thread> threads;
 
-      for(int scanline = 0; scanline < imageHeight_; scanline++) {
-        for(int pixel = 0; pixel < imageWidth_; pixel++) {
-          Vec3 pixelCenter   = firstPixel_ + (pixel * pixelDeltaU_) + (scanline * pixelDeltaV_);
-          Vec3 rayDirection  = pixelCenter - position_;
-          Ray ray {position_, rayDirection};
-          Color pixelColor = rayColor(ray, world);
-          writePixelToBufferPNG(buffer, pixelColor);
-        }
+    void
+    render(const HittableList& world) {
+      if(multiThread_) {
+        renderMultiThreaded(world);
+      } else {
+        renderSingleThreaded(world);
       }
-    }
-    
+    }     
+
     int
     getImageHeight() const {
-      return imageHeight_;
-    }
+        return imageHeight_;
+      }
 
     int
     getImageWidth() const {
-      return imageWidth_;
+        return imageWidth_;
+      }
+
+    void
+    setImageWidth(int imageWidth) {
+        imageWidth_ = imageWidth; 
+      }
+
+    void
+    setAspectRatio(float aspectRatio) {
+        aspectRatio_ = aspectRatio;
+      }
+    
+    void
+    setAntiAliasingSamplesPerPixel(int samples) {
+      samplesPerPixel_ = samples;
+      pixelSampleScale_ = 1.0f / samples;
     }
 
     void
-    setImageWidth(int value) {
-      imageWidth_ = value; 
+    setAntiAliasingSamplingType(AntialiasingSamplingType samplingType) {
+      samplingType_ = samplingType;
     }
 
     void
-    setAspectRatio(float value) {
-      aspectRatio_ = value;
+    setMultiThreading(bool state = true) {
+      multiThread_ = state;
+    }
+
+    ~Camera() {
+      delete[] buffer;
     }
 
   private:
@@ -46,9 +72,13 @@ class Camera {
     Vec3  firstPixel_;
     Vec3  pixelDeltaU_;
     Vec3  pixelDeltaV_;
+    int   samplesPerPixel_ = 1;
+    float pixelSampleScale_ = 1.0f / samplesPerPixel_;
+    AntialiasingSamplingType samplingType_ = SQUARE;
+    bool  multiThread_ = false;
 
-      void
-      initialize() {
+    void
+    initialize() {
         imageHeight_ = (int)(imageWidth_ / aspectRatio_);
         imageHeight_ = imageHeight_ < 1 ? 1 : imageHeight_;
 
@@ -66,17 +96,68 @@ class Camera {
         pixelDeltaU_      = viewportU / imageWidth_;
         pixelDeltaV_      = viewportV / imageHeight_;
         firstPixel_       = viewportOrigin + 0.5 * (pixelDeltaU_ + pixelDeltaV_);
-      }
+        
+        delete[] buffer;
+        buffer = new uint8_t[imageWidth_ * imageHeight_ * 4];
+    }
+
+    Ray
+    getRay(int pixel, int scanline) {
+      Vec3 offset = sampleSquare(); 
+      Vec3 pixelSample = firstPixel_ + ((pixel + offset.x()) * pixelDeltaU_) + ((scanline + offset.y()) * pixelDeltaV_);
+      return Ray(position_, pixelSample - position_);
+    }
+
+    Vec3
+    sampleSquare() {
+      return Vec3(math::random() - 0.5f, math::random() - 0.5f, 0.0f);
+    }
 
     Color
     rayColor(const Ray& ray, const HittableList& world) {
-      HitRecord hitRecord;
-      if(world.hit(ray, Interval(0, math::infinity()), hitRecord)) {
-        return 0.5f * (hitRecord.normal + Vec3(1.0f));
-      }  
+        HitRecord hitRecord;
+        if(world.hit(ray, Interval(0, math::infinity()), hitRecord)) {
+          return 0.5f * (hitRecord.normal + Vec3(1.0f));
+        }  
 
-      float a = 0.5f * (ray.direction().normalized().y() + 1.0f); // -1.0f - 1.0f --> 0.0f - 1.0f
-      return (1.0f - a)*Color(1.0f) + a*Color(0.5f, 0.7f, 1.0f); 
+        float a = 0.5f * (ray.direction().normalized().y() + 1.0f); // -1.0f - 1.0f --> 0.0f - 1.0f
+        return (1.0f - a)*Color(1.0f) + a*Color(0.5f, 0.7f, 1.0f); 
+    }
+
+    void
+    renderSingleThreaded(const HittableList& world) {
+      initialize();
+
+      for(int scanline = 0; scanline < imageHeight_; scanline++) {
+        for(int pixel = 0; pixel < imageWidth_; pixel++) {
+          int pixelIndex = (pixel + scanline * imageWidth_) * (ImageFormat::PNG::RGBA - 1);
+          Color pixelColor {0.0f};
+          for(int sample = 0; sample < samplesPerPixel_; sample++) {
+            Ray ray = getRay(pixel, scanline);
+            pixelColor += rayColor(ray, world);
+          }
+          writePixelToBufferPNG(buffer, pixelIndex, pixelSampleScale_ *  pixelColor);
+        }
+      }          
+    }
+
+    void
+    renderMultiThreaded(const HittableList& world) {
+      initialize();
+
+      for(int scanline = 0; scanline < imageHeight_; scanline++) {
+        threads.emplace_back([&, scanline]() {
+          for(int pixel = 0; pixel < imageWidth_; pixel++) {
+            int pixelIndex = (pixel + scanline * imageWidth_) * (ImageFormat::PNG::RGBA - 1);
+            Color pixelColor {0.0f};
+            for(int sample = 0; sample < samplesPerPixel_; sample++) {
+              Ray ray = getRay(pixel, scanline);
+              pixelColor += rayColor(ray, world);
+            }
+            writePixelToBufferPNG(buffer, pixelIndex, pixelSampleScale_ *  pixelColor);
+          }
+        });
+      }          
     }
 };
 
