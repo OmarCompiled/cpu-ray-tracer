@@ -34,7 +34,7 @@ main() {
     t.join();
   }
 
-  stbi_write_png("image.png", camera.getImageWidth(), camera.getImageHeight(), 3, camera.buffer, camera.getImageWidth() * 3);
+  stbi_write_png("image.png", camera.getImageWidth(), camera.getImageHeight(), 4, camera.buffer, camera.getImageWidth() * 4);
 
   return 0;
 }

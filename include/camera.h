@@ -130,7 +130,7 @@ class Camera {
 
       for(int scanline = 0; scanline < imageHeight_; scanline++) {
         for(int pixel = 0; pixel < imageWidth_; pixel++) {
-          int pixelIndex = (pixel + scanline * imageWidth_) * (ImageFormat::PNG::RGBA - 1);
+          int pixelIndex = (pixel + scanline * imageWidth_) * (ImageFormat::PNG::RGBA);
           Color pixelColor {0.0f};
           for(int sample = 0; sample < samplesPerPixel_; sample++) {
             Ray ray = getRay(pixel, scanline);
@@ -148,7 +148,7 @@ class Camera {
       for(int scanline = 0; scanline < imageHeight_; scanline++) {
         threads.emplace_back([&, scanline]() {
           for(int pixel = 0; pixel < imageWidth_; pixel++) {
-            int pixelIndex = (pixel + scanline * imageWidth_) * (ImageFormat::PNG::RGBA - 1);
+            int pixelIndex = (pixel + scanline * imageWidth_) * (ImageFormat::PNG::RGBA);
             Color pixelColor {0.0f};
             for(int sample = 0; sample < samplesPerPixel_; sample++) {
               Ray ray = getRay(pixel, scanline);
