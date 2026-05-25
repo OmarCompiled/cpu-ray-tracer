@@ -60,6 +60,11 @@ class Camera {
       multiThread_ = state;
     }
 
+    void
+    setMaxRayDepth(int depth) {
+      maxRayDepth_ = depth;
+    }
+
     ~Camera() {
       delete[] buffer;
     }
@@ -73,6 +78,7 @@ class Camera {
     Vec3  pixelDeltaU_;
     Vec3  pixelDeltaV_;
     int   samplesPerPixel_ = 1;
+    int   maxRayDepth_ = 10;
     float pixelSampleScale_ = 1.0f / samplesPerPixel_;
     AntialiasingSamplingType samplingType_ = SQUARE;
     bool  multiThread_ = false;
@@ -114,10 +120,15 @@ class Camera {
     }
 
     Color
-    rayColor(const Ray& ray, const HittableList& world) {
+    rayColor(const Ray& ray, int depth, const HittableList& world) {
+        if(depth <= 0) {
+          return Color(0.0f);
+        }
+
         HitRecord hitRecord;
-        if(world.hit(ray, Interval(0, math::infinity()), hitRecord)) {
-          return 0.5f * (hitRecord.normal + Vec3(1.0f));
+        if(world.hit(ray, Interval(0.001f, math::infinity()), hitRecord)) {
+          Vec3 direction = hitRecord.normal + vector::utilities::randomUnitVector();
+          return 0.5f * rayColor(Ray(hitRecord.point, direction), --depth, world);
         }  
 
         float a = 0.5f * (ray.direction().normalized().y() + 1.0f); // -1.0f - 1.0f --> 0.0f - 1.0f
@@ -134,7 +145,7 @@ class Camera {
           Color pixelColor {0.0f};
           for(int sample = 0; sample < samplesPerPixel_; sample++) {
             Ray ray = getRay(pixel, scanline);
-            pixelColor += rayColor(ray, world);
+            pixelColor += rayColor(ray, maxRayDepth_, world);
           }
           writePixelToBufferPNG(buffer, pixelIndex, pixelSampleScale_ *  pixelColor);
         }
@@ -152,7 +163,7 @@ class Camera {
             Color pixelColor {0.0f};
             for(int sample = 0; sample < samplesPerPixel_; sample++) {
               Ray ray = getRay(pixel, scanline);
-              pixelColor += rayColor(ray, world);
+              pixelColor += rayColor(ray, maxRayDepth_, world);
             }
             writePixelToBufferPNG(buffer, pixelIndex, pixelSampleScale_ *  pixelColor);
           }

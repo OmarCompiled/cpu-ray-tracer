@@ -24,10 +24,11 @@ main() {
   camera.setAspectRatio(16.0f / 9.0f);
   camera.setAntiAliasingSamplesPerPixel(10);
   camera.setMultiThreading();
+  camera.setMaxRayDepth(100);
 
   HittableList world;
-  world.add(std::make_shared<Sphere>(Vec3(0.0f, 0.0f, -1.0f), 0.3f));
-  world.add(std::make_shared<Sphere>(Vec3(0,-100.3,-1), 100));
+  world.add(std::make_shared<Sphere>(Vec3(0.0f, -1.0f, -5.0f), 1.0f));
+  world.add(std::make_shared<Sphere>(Vec3(0.0f, 1.0f, -5.0f), 1.0f));
   
   camera.render(world);
   for(std::thread& t : camera.threads) {

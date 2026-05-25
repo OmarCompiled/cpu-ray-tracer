@@ -245,18 +245,29 @@ Vec4::normalized() const {
   return *this/this->length();
 }
 
-
-namespace utilities {
-  inline Vec3
-  randomUnitVector() {
-    while(true) {
-      Vec3 randomVector = Vec3::random(-1, 1);
-      float lengthSquared = randomVector.lengthSquared();
-      if(std::numeric_limits<float>::min() < lengthSquared && lengthSquared <= 1.0f) {
-        return randomVector.normalized();
+namespace vector {
+  namespace utilities {
+    inline Vec3
+    randomUnitVector() {
+        while(true) {
+          Vec3 randomVector = Vec3::random(-1, 1);
+          float lengthSquared = randomVector.lengthSquared();
+          if(std::numeric_limits<float>::min() < lengthSquared && lengthSquared <= 1.0f) {
+            return randomVector.normalized();
+          }
+        }
       }
-    }
+
+    inline Vec3
+    randomVectorOnHemisphere(const Vec3& normal) {
+        Vec3 VectorOnHemisphere = randomUnitVector();
+        if(Vec3::dot(VectorOnHemisphere, normal) > 0.0f) {
+          return VectorOnHemisphere;
+        }
+        return -VectorOnHemisphere; 
+      }
   }
+
 }
 
 #endif
