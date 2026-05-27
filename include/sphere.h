@@ -7,8 +7,18 @@
 
 class Sphere : public Hittable {
   public:
-    Sphere(const Vec3& center, float radius) : center_(center), radius_(std::fmax(0, radius)) {};
+    Sphere(const Vec3& center, float radius, std::shared_ptr<Material> material) : center_(center), radius_(std::fmax(0, radius)), material_(material) {}
   
+    void
+    setMaterial(std::shared_ptr<Material> material) {
+      material_ = material;
+    }
+
+    void
+    setMaterial(const Material& material) {
+      material_ = std::make_shared<Material>(material);
+    }
+
     bool 
     hit(const Ray& ray, const Interval& interval, HitRecord& hitRecord) const override {
       Vec3 qc = center_ - ray.origin(); // qc arbitrary name; convention in mathematics (point p, q, etc...)
@@ -36,6 +46,7 @@ class Sphere : public Hittable {
       hitRecord.point = ray.at(hitRecord.t);
       outwardNormal = (hitRecord.point - center_).normalized();
       hitRecord.setFaceNormal(ray, outwardNormal);
+      hitRecord.material = material_;
 
       return true;
     }
@@ -43,6 +54,7 @@ class Sphere : public Hittable {
   private:
     Vec3 center_;
     float radius_;
+    std::shared_ptr<Material> material_;
 };
 
 #endif

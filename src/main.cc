@@ -13,6 +13,7 @@
 #include "../include/interval.h"
 #include "../include/hittable.h"
 #include "../include/hittable_list.h"
+#include "../include/material.h"
 #include "../include/sphere.h"
 #include "../include/camera.h"
 
@@ -26,9 +27,13 @@ main() {
   camera.setMultiThreading();
   camera.setMaxRayDepth(100);
 
+  auto diffuseMat = std::make_shared<Lambertian>(Color(1.0f, 0.5f, 0.3f));
+  auto sphere1 = std::make_shared<Sphere>(Vec3(0.0f, -1.0f, -5.0f), 1.0f, diffuseMat);
+  auto sphere2 = std::make_shared<Sphere>(Vec3(0.0f, 1.0f, -5.0f), 1.0f, diffuseMat);
+
   HittableList world;
-  world.add(std::make_shared<Sphere>(Vec3(0.0f, -1.0f, -5.0f), 1.0f));
-  world.add(std::make_shared<Sphere>(Vec3(0.0f, 1.0f, -5.0f), 1.0f));
+  world.add(sphere1);
+  world.add(sphere2);
   
   camera.render(world);
   for(std::thread& t : camera.threads) {

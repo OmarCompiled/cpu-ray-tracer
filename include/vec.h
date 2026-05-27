@@ -117,12 +117,18 @@ class Vec3 {
 
     static const Vec3 right;
     static const Vec3 up;
-    static const Vec3 forward ;
+    static const Vec3 forward;
+    
+    static const Vec3 one;
+    static const Vec3 zero;
 };
 
 const Vec3 Vec3::right    = Vec3::i();
 const Vec3 Vec3::up       = Vec3::j();
 const Vec3 Vec3::forward  = Vec3::k();
+
+const Vec3 Vec3::one      = Vec3(1.0f);
+const Vec3 Vec3::zero     = Vec3(0.0f);
 
 class Vec4 {
   private:

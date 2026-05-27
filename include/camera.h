@@ -127,8 +127,10 @@ class Camera {
 
         HitRecord hitRecord;
         if(world.hit(ray, Interval(0.001f, math::infinity()), hitRecord)) {
-          Vec3 direction = hitRecord.normal + vector::utilities::randomUnitVector();
-          return 0.5f * rayColor(Ray(hitRecord.point, direction), --depth, world);
+          if(hitRecord.material->scatter(ray, hitRecord)) {
+            return hitRecord.attenuation * rayColor(hitRecord.scatteredRay, --depth, world);
+          }
+          return Color(0.0f);
         }  
 
         float a = 0.5f * (ray.direction().normalized().y() + 1.0f); // -1.0f - 1.0f --> 0.0f - 1.0f

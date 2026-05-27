@@ -1,13 +1,21 @@
 #ifndef CPURAYTRACER_INCLUDE_HITTABLE_H_
 #define CPURAYTRACER_INCLUDE_HITTABLE_H_
 
+#include <memory>
+
 #include "ray.h"
 
+class Material;
 
 class HitRecord {
   public:
     Vec3 normal;
     Vec3 point;
+    std::shared_ptr<Material> material;
+    // bundled attemuation and scatteredRay here to decrease no. of
+    // function parameters;
+    Color attenuation;
+    Ray scatteredRay;
     float t;
 
     void
