@@ -272,6 +272,11 @@ namespace vector {
         }
         return -VectorOnHemisphere; 
       }
+
+    inline Vec3
+    reflect(const Vec3& v, const Vec3& n) {
+      return v - 2*Vec3::dot(v, n)*n;
+    }
   }
 
 }

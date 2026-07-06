@@ -27,13 +27,17 @@ main() {
   camera.setMultiThreading();
   camera.setMaxRayDepth(100);
 
-  auto diffuseMat = std::make_shared<Lambertian>(Color(1.0f, 0.5f, 0.3f));
-  auto sphere1 = std::make_shared<Sphere>(Vec3(0.0f, -1.0f, -5.0f), 1.0f, diffuseMat);
-  auto sphere2 = std::make_shared<Sphere>(Vec3(0.0f, 1.0f, -5.0f), 1.0f, diffuseMat);
+  auto coralDiffuseMaterial = std::make_shared<material::Metal>(Color(1.0f, 0.5f, 0.3f));
+  auto groundMaterial       = std::make_shared<material::Lambertian>(Color(0.3f, 1.0f, 0.4f));
+
+  auto sphere1      = std::make_shared<Sphere>(Vec3(0.0f, -1.0f, -5.0f), 1.0f, coralDiffuseMaterial);
+  auto sphere2      = std::make_shared<Sphere>(Vec3(0.0f,  1.0f, -5.0f), 1.0f, coralDiffuseMaterial);
+  auto groundSphere = std::make_shared<Sphere>(Vec3(0.0f, -102.0f, -5.0f), 100.0f, groundMaterial);
 
   HittableList world;
   world.add(sphere1);
   world.add(sphere2);
+  world.add(groundSphere);
   
   camera.render(world);
   for(std::thread& t : camera.threads) {
