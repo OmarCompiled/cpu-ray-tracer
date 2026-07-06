@@ -37,14 +37,16 @@ namespace material {
 
   class Metal : public Material {
     public:
-      Metal(const Color& albedo, float fuzz) : albedo_(albedo), fuzz_(fuzz < 1 ? fuzz : 1) {}
+      Metal(const Color& albedo, float fuzz) : albedo_(albedo), fuzz_(fuzz < 1 ? fuzz : 1) {
+      }
 
       bool
       scatter(const Ray& incidentRay, HitRecord& hitRecord) {
         Vec3 reflectionDirection  = vector::utilities::reflect(incidentRay.direction(), hitRecord.normal);
+        reflectionDirection       = reflectionDirection.normalized() + (fuzz_ * vector::utilities::randomUnitVector());
         hitRecord.scatteredRay    = Ray(hitRecord.point, reflectionDirection);
         hitRecord.attenuation     = albedo_;
-        return true;
+        return (Vec3::dot(hitRecord.scatteredRay.direction(), hitRecord.normal) > 0);
       }
 
     private:
