@@ -277,6 +277,12 @@ namespace vector {
     reflect(const Vec3& v, const Vec3& n) {
       return v - 2*Vec3::dot(v, n)*n;
     }
+
+    inline Vec3
+    refract(const Vec3& v, const Vec3& n, float etaRatio) {
+      float cosTheta = std::fmin(Vec3::dot(-n, v), 1.0f);
+      return etaRatio*v + (etaRatio*cosTheta - std::sqrt(1-(etaRatio*etaRatio)*(1-(cosTheta*cosTheta))))*n;
+    }
   }
 
 }

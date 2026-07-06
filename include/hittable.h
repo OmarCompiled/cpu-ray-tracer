@@ -16,11 +16,12 @@ class HitRecord {
     // function parameters;
     Color attenuation;
     Ray scatteredRay;
+    bool frontFace;
     float t;
 
     void
     setFaceNormal(const Ray& ray, const Vec3& outwardNormal) {
-      bool frontFace = Vec3::dot(ray.direction(), outwardNormal) < 0; 
+      frontFace = Vec3::dot(ray.direction(), outwardNormal) < 0; 
       normal = frontFace ? outwardNormal : -outwardNormal; // if normal is in same direction, flip normal
     }
 };

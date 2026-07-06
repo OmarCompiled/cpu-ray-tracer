@@ -8,7 +8,7 @@ class Material {
     virtual ~Material() = default;
 
     virtual bool
-    scatter(const Ray& incidentRay, HitRecord& hitRecord) {
+    scatter(const Ray& incidentRay, HitRecord& hitRecord) const {
       return false; 
     }
 };
@@ -20,7 +20,7 @@ namespace material {
       Lambertian(const Color& albedo) : albedo_(albedo) {}
 
       bool
-      scatter(const Ray& incidentRay, HitRecord& hitRecord) {
+      scatter(const Ray& incidentRay, HitRecord& hitRecord) const override{
         Vec3 scatterDirection   = hitRecord.normal + vector::utilities::randomUnitVector();
         if(scatterDirection == Vec3::zero) {
           scatterDirection = hitRecord.normal;
@@ -41,7 +41,7 @@ namespace material {
       }
 
       bool
-      scatter(const Ray& incidentRay, HitRecord& hitRecord) {
+      scatter(const Ray& incidentRay, HitRecord& hitRecord) const override {
         Vec3 reflectionDirection  = vector::utilities::reflect(incidentRay.direction(), hitRecord.normal);
         reflectionDirection       = reflectionDirection.normalized() + (fuzz_ * vector::utilities::randomUnitVector());
         hitRecord.scatteredRay    = Ray(hitRecord.point, reflectionDirection);
@@ -52,6 +52,22 @@ namespace material {
     private:
       Color albedo_;
       float fuzz_;
+  };
+
+  class Dielectric : public Material {
+    public:
+      Dielectric(float refractiveIndex) : refractiveIndex_(refractiveIndex) {}
+
+      bool scatter(const Ray& incidentRay, HitRecord& hitRecord) const override {
+        float eta = hitRecord.frontFace ? (1.0f/refractiveIndex_) : refractiveIndex_;
+        Vec3 refractedRay = vector::utilities::refract(incidentRay.direction().normalized(), hitRecord.normal, eta);
+        hitRecord.scatteredRay = Ray {hitRecord.point, refractedRay};
+        hitRecord.attenuation = Color(1.0f);
+        return true;
+      }
+
+    private:
+      float refractiveIndex_;
   };
 }
 #endif

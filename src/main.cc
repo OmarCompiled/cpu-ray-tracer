@@ -29,9 +29,10 @@ main() {
 
   auto coralDiffuseMaterial = std::make_shared<material::Metal>(Color(1.0f, 0.5f, 0.3f), 0);
   auto groundMaterial       = std::make_shared<material::Lambertian>(Color(0.3f, 1.0f, 0.4f));
+  auto dielectricMaterial   = std::make_shared<material::Dielectric>(1.5f);
 
   auto sphere1      = std::make_shared<Sphere>(Vec3(0.0f, -1.0f, -5.0f), 1.0f, coralDiffuseMaterial);
-  auto sphere2      = std::make_shared<Sphere>(Vec3(0.0f,  1.0f, -5.0f), 1.0f, coralDiffuseMaterial);
+  auto sphere2      = std::make_shared<Sphere>(Vec3(0.0f,  1.0f, -5.0f), 1.0f, dielectricMaterial);
   auto groundSphere = std::make_shared<Sphere>(Vec3(0.0f, -102.0f, -5.0f), 100.0f, groundMaterial);
 
   HittableList world;
